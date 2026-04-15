@@ -1,0 +1,6 @@
+{"id":"AGG_1","category":"aggregation","question":"What is the average closing price of NVDA?","expected_behavior":"ok"}
+{"id":"TW_1","category":"time_window","question":"What is the average close of NVDA in the last 7 days?","expected_behavior":"ok"}
+{"id":"CMP_2","category":"comparison","question":"Which has higher average close, TSLA or AMZN?","expected_behavior":"ok"}
+{"id":"CMP_5","category":"comparison","question":"Show difference in average close between AAPL and MSFT.","expected_behavior":"ok"}
+{"id":"CMP_9","category":"comparison","question":"Is NVDA trading higher than AAPL on average?","expected_behavior":"ok"}
+{"id":"EDGE_1","category":"edge_case","question":"Show data for ticker XYZ123.","expected_behavior":"no_data"}

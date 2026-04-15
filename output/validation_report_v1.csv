@@ -1,0 +1,67 @@
+id,category,question,expected_status,pred_status,match,error_type,pred_sql,gold_sql
+AGG_1,aggregation,What is the average closing price of NVDA?,ok,ok,True,,"SELECT AVG(close) AS average_closing_price
+FROM market_data
+WHERE ticker = 'NVDA'
+LIMIT 200;",SELECT AVG(close) AS avg_close FROM market_data WHERE ticker = 'NVDA';
+AGG_6,aggregation,What is the total trading volume for AAPL?,ok,ok,True,,"SELECT SUM(volume) AS total_volume
+FROM market_data
+WHERE ticker = 'AAPL'
+LIMIT 200;",SELECT SUM(volume) AS total_volume FROM market_data WHERE ticker = 'AAPL';
+AGG_7,aggregation,Sum up all volume for TSLA.,ok,ok,True,,"SELECT SUM(volume) 
+FROM market_data 
+WHERE ticker = 'TSLA';",SELECT SUM(volume) AS total_volume FROM market_data WHERE ticker = 'TSLA';
+AGG_9,aggregation,Find the lowest closing price for META.,ok,ok,True,,"SELECT MIN(close) AS lowest_closing_price
+FROM market_data
+WHERE ticker = 'META'
+LIMIT 200;",SELECT MIN(close) AS min_close FROM market_data WHERE ticker = 'META';
+TW_1,time_window,What is the average close of NVDA in the last 7 days?,ok,ok,True,,"SELECT AVG(close) 
+FROM market_data 
+WHERE ticker = 'NVDA' 
+AND ""timestamp"" >= (SELECT MAX(""timestamp"") FROM market_data WHERE ticker = 'NVDA') - INTERVAL '7 days' 
+LIMIT 200;","WITH anchor AS ( SELECT MAX(""timestamp"") AS max_ts FROM market_data WHERE ticker = 'NVDA' ) SELECT AVG(close) AS avg_close FROM market_data WHERE ticker = 'NVDA' AND ""timestamp"" >= (SELECT max_ts FROM anchor) - INTERVAL '7 days';"
+TW_2,time_window,What is NVDA’s average closing price over the past week?,ok,ok,True,,"SELECT AVG(close) 
+FROM market_data 
+WHERE ticker = 'NVDA' 
+AND ""timestamp"" >= (SELECT MAX(""timestamp"") FROM market_data WHERE ticker = 'NVDA') - INTERVAL '7 days' 
+LIMIT 200;","WITH anchor AS ( SELECT MAX(""timestamp"") AS max_ts FROM market_data WHERE ticker = 'NVDA' ) SELECT AVG(close) AS avg_close FROM market_data WHERE ticker = 'NVDA' AND ""timestamp"" >= (SELECT max_ts FROM anchor) - INTERVAL '7 days';"
+TW_4,time_window,Show me AAPL prices in the last month.,ok,ok,True,,"SELECT *
+FROM market_data
+WHERE ticker = 'AAPL' 
+AND ""timestamp"" >= (SELECT MAX(""timestamp"") FROM market_data WHERE ticker = 'AAPL') - INTERVAL '30 days'
+LIMIT 200;","WITH anchor AS ( SELECT MAX(""timestamp"") AS max_ts FROM market_data WHERE ticker = 'AAPL' ) SELECT * FROM market_data WHERE ticker = 'AAPL' AND ""timestamp"" >= (SELECT max_ts FROM anchor) - INTERVAL '30 days' ORDER BY ""timestamp"" ASC LIMIT 200;"
+TW_5,time_window,Give me TSLA data for the past 30 days.,ok,ok,True,,"SELECT *
+FROM market_data
+WHERE ticker = 'TSLA' AND ""timestamp"" >= (SELECT MAX(""timestamp"") FROM market_data WHERE ticker = 'TSLA') - INTERVAL '30 days'
+LIMIT 200;","WITH anchor AS ( SELECT MAX(""timestamp"") AS max_ts FROM market_data WHERE ticker = 'TSLA' ) SELECT * FROM market_data WHERE ticker = 'TSLA' AND ""timestamp"" >= (SELECT max_ts FROM anchor) - INTERVAL '30 days' ORDER BY ""timestamp"" ASC LIMIT 200;"
+TW_14,time_window,What is the average close for NVDA over the last trading week?,ok,ok,True,,"SELECT AVG(close) 
+FROM market_data 
+WHERE ticker = 'NVDA' 
+AND ""timestamp"" >= (SELECT MAX(""timestamp"") FROM market_data WHERE ticker = 'NVDA') - INTERVAL '7 days' 
+LIMIT 200;","WITH anchor AS ( SELECT MAX(""timestamp"") AS max_ts FROM market_data WHERE ticker = 'NVDA' ) SELECT AVG(close) AS avg_close FROM market_data WHERE ticker = 'NVDA' AND ""timestamp"" >= (SELECT max_ts FROM anchor) - INTERVAL '7 days';"
+CMP_1,comparison,Compare the average price of NVDA and AAPL.,ok,ok,True,,"SELECT ticker, AVG(close) AS average_price
+FROM market_data
+WHERE ticker IN ('NVDA', 'AAPL')
+GROUP BY ticker
+LIMIT 200;","SELECT ticker, AVG(close) AS avg_close FROM market_data WHERE ticker IN ('NVDA', 'AAPL') GROUP BY ticker ORDER BY ticker;"
+CMP_2,comparison,"Which has higher average close, TSLA or AMZN?",ok,ok,False,aggregation_or_comparison_error,"SELECT ticker, AVG(close) AS average_close
+FROM market_data
+WHERE ticker IN ('TSLA', 'AMZN')
+GROUP BY ticker;","SELECT ticker, AVG(close) AS avg_close FROM market_data WHERE ticker IN ('TSLA', 'AMZN') GROUP BY ticker ORDER BY avg_close DESC LIMIT 1;"
+CMP_5,comparison,Show difference in average close between AAPL and MSFT.,ok,ok,False,aggregation_or_comparison_error,"SELECT 
+    AVG(CASE WHEN ticker = 'AAPL' THEN close END) AS avg_close_aapl,
+    AVG(CASE WHEN ticker = 'MSFT' THEN close END) AS avg_close_msft
+FROM market_data
+WHERE ticker IN ('AAPL', 'MSFT')
+GROUP BY ticker;","WITH avg_by_ticker AS ( SELECT ticker, AVG(close) AS avg_close FROM market_data WHERE ticker IN ('AAPL', 'MSFT') GROUP BY ticker ) SELECT ABS(MAX(CASE WHEN ticker = 'AAPL' THEN avg_close END) - MAX(CASE WHEN ticker = 'MSFT' THEN avg_close END)) AS avg_close_difference FROM avg_by_ticker;"
+CMP_6,comparison,"Which stock had more trades, TSLA or NVDA?",ok,ok,False,aggregation_or_comparison_error,"SELECT ticker, SUM(volume) AS total_trades
+FROM market_data
+WHERE ticker IN ('TSLA', 'NVDA')
+GROUP BY ticker
+ORDER BY total_trades DESC
+LIMIT 200;","SELECT ticker, COUNT(*) AS trade_count FROM market_data WHERE ticker IN ('TSLA', 'NVDA') GROUP BY ticker ORDER BY trade_count DESC LIMIT 1;"
+CMP_9,comparison,Is NVDA trading higher than AAPL on average?,ok,ok,False,aggregation_or_comparison_error,"SELECT AVG(CASE WHEN ticker = 'NVDA' THEN close END) AS avg_nvda,
+       AVG(CASE WHEN ticker = 'AAPL' THEN close END) AS avg_aapl
+FROM market_data
+WHERE ticker IN ('NVDA', 'AAPL')
+GROUP BY ticker;","WITH avg_by_ticker AS ( SELECT ticker, AVG(close) AS avg_close FROM market_data WHERE ticker IN ('NVDA', 'AAPL') GROUP BY ticker ) SELECT CASE WHEN MAX(CASE WHEN ticker = 'NVDA' THEN avg_close END) > MAX(CASE WHEN ticker = 'AAPL' THEN avg_close END) THEN TRUE ELSE FALSE END AS nvda_higher_on_average FROM avg_by_ticker;"
+BR_6,basic_retrieval,Fetch all records with ticker AMZN.,ok,ok,True,,SELECT * FROM market_data WHERE ticker = 'AMZN' LIMIT 200;,"SELECT * FROM market_data WHERE ticker = 'AMZN' ORDER BY ""timestamp"" ASC LIMIT 200;"

@@ -27,6 +27,7 @@ Columns:
 - volume (BIGINT)
 """
 
+# This module takes a natural language question, generates SQL, runs it against the database, and returns the results in a structured format.
 def generate_sql(question):
     prompt = f"""
 You are a PostgreSQL expert.
@@ -70,7 +71,7 @@ User question:
     return sql
 
 
-
+# Run the generated SQL and return results in a structured format
 def run_sql(sql: str):
     with engine.connect() as conn:
         result = conn.execute(text(sql))
@@ -178,17 +179,6 @@ def eval_one(question: str):
 
 
 
-# if __name__ == "__main__":
-#     question = input("Ask: ")
-    
-#     sql = generate_sql(question)
-#     sql = secure_sql(sql) # apply security layer
-#     print("\nGenerated SQL:\n", sql)
-
-#     # rows = run_sql(sql)
-#     # print("\nResult:\n", rows)
-#     out = run_sql(sql)
-#     print("\nResult(JSON):\n", out)
 
 if __name__ == "__main__":
     question = input("Ask: ")

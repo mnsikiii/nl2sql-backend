@@ -1,0 +1,27 @@
+id,category,question,expected_behavior,pred_status,sql,data_columns,data_rows,final_answer,message,has_limit,uses_now,result_correct,answer_faithful_to_data,answer_satisfies_request,needs_clarification,notes
+AGG_1,aggregation,What is the average closing price of NVDA?,ok,ok,"SELECT AVG(close) AS average_closing_price
+FROM market_data
+WHERE ticker = 'NVDA';","[""average_closing_price""]",[[145.57007019642072]],The average closing price of NVDA is 145.57.,,False,False,,,,,
+TW_1,time_window,What is the average close of NVDA in the last 7 days?,ok,ok,"SELECT AVG(close) 
+FROM market_data 
+WHERE ticker = 'NVDA' 
+AND ""timestamp"" >= (SELECT MAX(""timestamp"") FROM market_data WHERE ticker = 'NVDA') - INTERVAL '7 days' 
+LIMIT 200;","[""avg""]",[[186.71433537206957]],The average close of NVDA in the last 7 days is 186.71.,,True,False,,,,,
+CMP_2,comparison,"Which has higher average close, TSLA or AMZN?",ok,ok,"SELECT ticker, AVG(close) AS average_close
+FROM market_data
+WHERE ticker IN ('TSLA', 'AMZN')
+GROUP BY ticker;","[""ticker"", ""average_close""]","[[""AMZN"", 213.2156982048574], [""TSLA"", 327.2432239881745]]",TSLA has a higher average close than AMZN.,,False,False,,,,,
+CMP_5,comparison,Show difference in average close between AAPL and MSFT.,ok,ok,"SELECT 
+    AVG(CASE WHEN ticker = 'AAPL' THEN close END) AS avg_close_aapl,
+    AVG(CASE WHEN ticker = 'MSFT' THEN close END) AS avg_close_msft
+FROM market_data
+WHERE ticker IN ('AAPL', 'MSFT')
+GROUP BY ticker;","[""avg_close_aapl"", ""avg_close_msft""]","[[220.56196636158828, null], [null, 457.54920835387173]]","The average close for AAPL is 220.56, and for MSFT is 457.55. The difference in average close between AAPL and MSFT is 236.99 (457.55 - 220.56).",,False,False,,,,,
+CMP_9,comparison,Is NVDA trading higher than AAPL on average?,ok,ok,"SELECT 
+    AVG(CASE WHEN ticker = 'NVDA' THEN close END) AS avg_nvda,
+    AVG(CASE WHEN ticker = 'AAPL' THEN close END) AS avg_aapl
+FROM market_data
+WHERE ticker IN ('NVDA', 'AAPL')
+GROUP BY ticker
+LIMIT 200;","[""avg_nvda"", ""avg_aapl""]","[[null, 220.56196636158828], [145.5700701964201, null]]","NVDA's average closing price is not available, while AAPL's average closing price is approximately 220.56. Therefore, we cannot determine if NVDA is trading higher than AAPL on average.",,True,False,,,,,
+EDGE_1,edge_case,Show data for ticker XYZ123.,no_data,no_data,SELECT * FROM market_data WHERE ticker = 'XYZ123' LIMIT 200;,"[""ticker"", ""timestamp"", ""open"", ""high"", ""low"", ""close"", ""volume""]",[],No data found for the given query conditions.,No data found for the given query conditions.,,,,,,,

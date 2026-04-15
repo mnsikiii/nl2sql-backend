@@ -1,0 +1,2 @@
+summary_eval_report_v1: run_summary_eval.py 评估总结模型的结果（0413）
+validation_report_v1: run_calidation_v1.py 评估sql输出的效果（0413）

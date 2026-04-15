@@ -1,0 +1,255 @@
+{
+  "summary": {
+    "total": 15,
+    "ok_count": 15,
+    "match_count": 11,
+    "accuracy": 0.7333333333333333,
+    "execution_success_rate": 1.0,
+    "now_violations": 0,
+    "by_category": {
+      "aggregation": {
+        "total": 4,
+        "matched": 4
+      },
+      "time_window": {
+        "total": 5,
+        "matched": 5
+      },
+      "comparison": {
+        "total": 5,
+        "matched": 1
+      },
+      "basic_retrieval": {
+        "total": 1,
+        "matched": 1
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "AGG_1",
+      "category": "aggregation",
+      "question": "What is the average closing price of NVDA?",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT AVG(close) AS average_closing_price\nFROM market_data\nWHERE ticker = 'NVDA'\nLIMIT 200;",
+      "gold_sql": "SELECT AVG(close) AS avg_close FROM market_data WHERE ticker = 'NVDA';",
+      "match": true,
+      "error_type": null,
+      "meta": {
+        "has_limit": true,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "AGG_6",
+      "category": "aggregation",
+      "question": "What is the total trading volume for AAPL?",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT SUM(volume) AS total_volume\nFROM market_data\nWHERE ticker = 'AAPL'\nLIMIT 200;",
+      "gold_sql": "SELECT SUM(volume) AS total_volume FROM market_data WHERE ticker = 'AAPL';",
+      "match": true,
+      "error_type": null,
+      "meta": {
+        "has_limit": true,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "AGG_7",
+      "category": "aggregation",
+      "question": "Sum up all volume for TSLA.",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT SUM(volume) \nFROM market_data \nWHERE ticker = 'TSLA';",
+      "gold_sql": "SELECT SUM(volume) AS total_volume FROM market_data WHERE ticker = 'TSLA';",
+      "match": true,
+      "error_type": null,
+      "meta": {
+        "has_limit": false,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "AGG_9",
+      "category": "aggregation",
+      "question": "Find the lowest closing price for META.",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT MIN(close) AS lowest_closing_price\nFROM market_data\nWHERE ticker = 'META'\nLIMIT 200;",
+      "gold_sql": "SELECT MIN(close) AS min_close FROM market_data WHERE ticker = 'META';",
+      "match": true,
+      "error_type": null,
+      "meta": {
+        "has_limit": true,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "TW_1",
+      "category": "time_window",
+      "question": "What is the average close of NVDA in the last 7 days?",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT AVG(close) \nFROM market_data \nWHERE ticker = 'NVDA' \nAND \"timestamp\" >= (SELECT MAX(\"timestamp\") FROM market_data WHERE ticker = 'NVDA') - INTERVAL '7 days' \nLIMIT 200;",
+      "gold_sql": "WITH anchor AS ( SELECT MAX(\"timestamp\") AS max_ts FROM market_data WHERE ticker = 'NVDA' ) SELECT AVG(close) AS avg_close FROM market_data WHERE ticker = 'NVDA' AND \"timestamp\" >= (SELECT max_ts FROM anchor) - INTERVAL '7 days';",
+      "match": true,
+      "error_type": null,
+      "meta": {
+        "has_limit": true,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "TW_2",
+      "category": "time_window",
+      "question": "What is NVDA’s average closing price over the past week?",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT AVG(close) \nFROM market_data \nWHERE ticker = 'NVDA' \nAND \"timestamp\" >= (SELECT MAX(\"timestamp\") FROM market_data WHERE ticker = 'NVDA') - INTERVAL '7 days' \nLIMIT 200;",
+      "gold_sql": "WITH anchor AS ( SELECT MAX(\"timestamp\") AS max_ts FROM market_data WHERE ticker = 'NVDA' ) SELECT AVG(close) AS avg_close FROM market_data WHERE ticker = 'NVDA' AND \"timestamp\" >= (SELECT max_ts FROM anchor) - INTERVAL '7 days';",
+      "match": true,
+      "error_type": null,
+      "meta": {
+        "has_limit": true,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "TW_4",
+      "category": "time_window",
+      "question": "Show me AAPL prices in the last month.",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT *\nFROM market_data\nWHERE ticker = 'AAPL' \nAND \"timestamp\" >= (SELECT MAX(\"timestamp\") FROM market_data WHERE ticker = 'AAPL') - INTERVAL '30 days'\nLIMIT 200;",
+      "gold_sql": "WITH anchor AS ( SELECT MAX(\"timestamp\") AS max_ts FROM market_data WHERE ticker = 'AAPL' ) SELECT * FROM market_data WHERE ticker = 'AAPL' AND \"timestamp\" >= (SELECT max_ts FROM anchor) - INTERVAL '30 days' ORDER BY \"timestamp\" ASC LIMIT 200;",
+      "match": true,
+      "error_type": null,
+      "meta": {
+        "has_limit": true,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "TW_5",
+      "category": "time_window",
+      "question": "Give me TSLA data for the past 30 days.",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT *\nFROM market_data\nWHERE ticker = 'TSLA' AND \"timestamp\" >= (SELECT MAX(\"timestamp\") FROM market_data WHERE ticker = 'TSLA') - INTERVAL '30 days'\nLIMIT 200;",
+      "gold_sql": "WITH anchor AS ( SELECT MAX(\"timestamp\") AS max_ts FROM market_data WHERE ticker = 'TSLA' ) SELECT * FROM market_data WHERE ticker = 'TSLA' AND \"timestamp\" >= (SELECT max_ts FROM anchor) - INTERVAL '30 days' ORDER BY \"timestamp\" ASC LIMIT 200;",
+      "match": true,
+      "error_type": null,
+      "meta": {
+        "has_limit": true,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "TW_14",
+      "category": "time_window",
+      "question": "What is the average close for NVDA over the last trading week?",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT AVG(close) \nFROM market_data \nWHERE ticker = 'NVDA' \nAND \"timestamp\" >= (SELECT MAX(\"timestamp\") FROM market_data WHERE ticker = 'NVDA') - INTERVAL '7 days' \nLIMIT 200;",
+      "gold_sql": "WITH anchor AS ( SELECT MAX(\"timestamp\") AS max_ts FROM market_data WHERE ticker = 'NVDA' ) SELECT AVG(close) AS avg_close FROM market_data WHERE ticker = 'NVDA' AND \"timestamp\" >= (SELECT max_ts FROM anchor) - INTERVAL '7 days';",
+      "match": true,
+      "error_type": null,
+      "meta": {
+        "has_limit": true,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "CMP_1",
+      "category": "comparison",
+      "question": "Compare the average price of NVDA and AAPL.",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT ticker, AVG(close) AS average_price\nFROM market_data\nWHERE ticker IN ('NVDA', 'AAPL')\nGROUP BY ticker\nLIMIT 200;",
+      "gold_sql": "SELECT ticker, AVG(close) AS avg_close FROM market_data WHERE ticker IN ('NVDA', 'AAPL') GROUP BY ticker ORDER BY ticker;",
+      "match": true,
+      "error_type": null,
+      "meta": {
+        "has_limit": true,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "CMP_2",
+      "category": "comparison",
+      "question": "Which has higher average close, TSLA or AMZN?",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT ticker, AVG(close) AS average_close\nFROM market_data\nWHERE ticker IN ('TSLA', 'AMZN')\nGROUP BY ticker;",
+      "gold_sql": "SELECT ticker, AVG(close) AS avg_close FROM market_data WHERE ticker IN ('TSLA', 'AMZN') GROUP BY ticker ORDER BY avg_close DESC LIMIT 1;",
+      "match": false,
+      "error_type": "aggregation_or_comparison_error",
+      "meta": {
+        "has_limit": false,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "CMP_5",
+      "category": "comparison",
+      "question": "Show difference in average close between AAPL and MSFT.",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT \n    AVG(CASE WHEN ticker = 'AAPL' THEN close END) AS avg_close_aapl,\n    AVG(CASE WHEN ticker = 'MSFT' THEN close END) AS avg_close_msft\nFROM market_data\nWHERE ticker IN ('AAPL', 'MSFT')\nGROUP BY ticker;",
+      "gold_sql": "WITH avg_by_ticker AS ( SELECT ticker, AVG(close) AS avg_close FROM market_data WHERE ticker IN ('AAPL', 'MSFT') GROUP BY ticker ) SELECT ABS(MAX(CASE WHEN ticker = 'AAPL' THEN avg_close END) - MAX(CASE WHEN ticker = 'MSFT' THEN avg_close END)) AS avg_close_difference FROM avg_by_ticker;",
+      "match": false,
+      "error_type": "aggregation_or_comparison_error",
+      "meta": {
+        "has_limit": false,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "CMP_6",
+      "category": "comparison",
+      "question": "Which stock had more trades, TSLA or NVDA?",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT ticker, SUM(volume) AS total_trades\nFROM market_data\nWHERE ticker IN ('TSLA', 'NVDA')\nGROUP BY ticker\nORDER BY total_trades DESC\nLIMIT 200;",
+      "gold_sql": "SELECT ticker, COUNT(*) AS trade_count FROM market_data WHERE ticker IN ('TSLA', 'NVDA') GROUP BY ticker ORDER BY trade_count DESC LIMIT 1;",
+      "match": false,
+      "error_type": "aggregation_or_comparison_error",
+      "meta": {
+        "has_limit": true,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "CMP_9",
+      "category": "comparison",
+      "question": "Is NVDA trading higher than AAPL on average?",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT AVG(CASE WHEN ticker = 'NVDA' THEN close END) AS avg_nvda,\n       AVG(CASE WHEN ticker = 'AAPL' THEN close END) AS avg_aapl\nFROM market_data\nWHERE ticker IN ('NVDA', 'AAPL')\nGROUP BY ticker;",
+      "gold_sql": "WITH avg_by_ticker AS ( SELECT ticker, AVG(close) AS avg_close FROM market_data WHERE ticker IN ('NVDA', 'AAPL') GROUP BY ticker ) SELECT CASE WHEN MAX(CASE WHEN ticker = 'NVDA' THEN avg_close END) > MAX(CASE WHEN ticker = 'AAPL' THEN avg_close END) THEN TRUE ELSE FALSE END AS nvda_higher_on_average FROM avg_by_ticker;",
+      "match": false,
+      "error_type": "aggregation_or_comparison_error",
+      "meta": {
+        "has_limit": false,
+        "uses_now": false
+      }
+    },
+    {
+      "id": "BR_6",
+      "category": "basic_retrieval",
+      "question": "Fetch all records with ticker AMZN.",
+      "expected_status": "ok",
+      "pred_status": "ok",
+      "pred_sql": "SELECT * FROM market_data WHERE ticker = 'AMZN' LIMIT 200;",
+      "gold_sql": "SELECT * FROM market_data WHERE ticker = 'AMZN' ORDER BY \"timestamp\" ASC LIMIT 200;",
+      "match": true,
+      "error_type": null,
+      "meta": {
+        "has_limit": true,
+        "uses_now": false
+      }
+    }
+  ]
+}
