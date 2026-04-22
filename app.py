@@ -11,7 +11,7 @@ app = FastAPI(title="NL2SQL Backend")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # 先全开，后面再收紧
+    allow_origins=["*"],   # Allow all origins for now, restrict later in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
