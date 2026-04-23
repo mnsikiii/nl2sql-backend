@@ -11,7 +11,7 @@ class Settings:
     # Database configuration
     DATABASE_URL: str = os.environ.get(
         "DATABASE_URL",
-        "postgresql://neondb_owner:npg_E1ORCYPudZf8@ep-jolly-lake-aiqvtx3p-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require"
+        ""
     )
     
     # Database connection pool settings
