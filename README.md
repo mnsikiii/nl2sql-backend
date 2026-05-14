@@ -23,9 +23,17 @@ It takes a natural-language question, generates SQL, executes it, and returns a 
 - `tests/manual/`: Manual and stage-specific test scripts
 - `scripts/`: Data import and evaluation scripts
 
+## Prerequisites
+
+- Python 3.11+
+- PostgreSQL database (or compatible, e.g., Neon)
+- OpenAI API key
+
 ## Quick Start
 
-1) Install dependencies
+### Option 1: Local Python Environment
+
+1. Install dependencies
 
 ```bash
 python -m venv venv
@@ -33,7 +41,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-2) Configure environment variables
+2. Configure environment variables
 
 ```bash
 cp .env.example .env
@@ -43,7 +51,7 @@ Required variables:
 - `DATABASE_URL`
 - `OPENAI_API_KEY`
 
-3) Start the service
+3. Start the service
 
 ```bash
 python main.py
@@ -52,6 +60,22 @@ python main.py
 Default endpoints:
 - `http://127.0.0.1:8000`
 - Swagger: `http://127.0.0.1:8000/docs`
+
+### Option 2: Docker
+
+1. Build the Docker image
+
+```bash
+docker build -t nl2sql-backend .
+```
+
+2. Run the container
+
+```bash
+docker run -p 8000:8080 --env-file .env nl2sql-backend
+```
+
+Note: Ensure your `.env` file is in the current directory and contains the required variables.
 
 ## API
 
@@ -79,6 +103,14 @@ Default endpoints:
 - `meta`
 
 ## Testing
+
+Install development dependencies:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Run tests:
 
 ```bash
 pytest tests -q
