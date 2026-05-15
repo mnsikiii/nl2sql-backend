@@ -20,4 +20,5 @@ venv/
 .venv/
 env/
 
-output/unnecessary_files/
+output/
+unnecessary_files/
